@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GREENADO | Mikrožalumynai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --brand-green: #004d3d; --light-green: #00ffcc; }
+        .product-card {
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            perspective: 1000px;
+        }
+        .product-card:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 0 20px 30px rgba(0, 77, 61, 0.15);
+        }
+        .slogan-text { color: var(--brand-green); font-weight: 600; }
+    </style>
+</head>
+<body class="bg-white text-stone-800">
+
+    <nav class="sticky top-0 bg-white shadow-sm z-50 border-b border-stone-100 h-16 md:h-20">
+    <div class="w-full h-full flex justify-between items-center">
+        
+        <div class="h-full">
+            <img src="logo.jpg" alt="GREENADO" class="h-full w-auto object-contain object-left">
+        </div>
+        
+        <div class="hidden lg:block">
+            <p class="slogan-text text-lg italic font-semibold text-emerald-800">„Maži daigai = didelė galia“</p>
+        </div>
+
+        <div class="pr-6">
+            <button onclick="toggleCart()" class="relative p-2 text-emerald-900">
+                <i class="fa-solid fa-basket-shopping text-2xl"></i>
+                <span id="cart-count" class="absolute -top-1 -right-1 bg-green-500 text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+            </button>
+        </div>
+        
+    </div>
+</nav>
+
+
+    <header class="py-16 bg-stone-50 text-center px-4">
+        <h2 class="text-4xl md:text-5xl font-bold mb-4" style="color: var(--brand-green);">GREENADO</h2>
+        <p class="text-xl max-w-2xl mx-auto italic opacity-80">Švieži mikrožalumynai Kaune, Jonavoje ir apylinkėse</p>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="product-grid">
+            </div>
+    </main>
+
+    <section class="bg-emerald-900 text-white py-20 px-6 mt-12">
+        <div class="container mx-auto max-w-4xl text-center">
+            <h2 class="text-3xl font-bold mb-8">Kodėl GREENADO?</h2>
+            <p class="text-lg leading-relaxed mb-6 italic text-emerald-100">
+                Šiuolaikiniame skubančiame pasaulyje mikrowgreenai yra tikras "supermaistas"...
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 text-left">
+                <div class="p-4 border border-emerald-700 rounded-xl">
+                    <h4 class="font-bold mb-2">🚚 Pristatymas</h4>
+                    <p class="text-sm opacity-80">Kaunas, Jonava ir apylinkės. Pristatome pirmadieniais ir ketvirtadieniais.</p>
+                </div>
+                <div class="p-4 border border-emerald-700 rounded-xl">
+                    <h4 class="font-bold mb-2">✅ Kokybė</h4>
+                    <p class="text-sm opacity-80">Auginama be pesticidų, naudojant tik švarų vandenį ir aukščiausios kokybės sėklas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-white border-t py-12 px-6 text-sm text-stone-500">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <h5 class="font-bold mb-4 text-stone-900">Kontaktai</h5>
+                <p>Kaunas / Jonava, Lietuva</p>
+                <p>Greitai: Sertifikatai</p>
+            </div>
+            <div>
+                <h5 class="font-bold mb-4 text-stone-900">Teisinė informacija</h5>
+                <p><a href="#" class="hover:underline">Privatumo politika</a></p>
+                <p><a href="#" class="hover:underline">Taisyklės ir nuostatos</a></p>
+            </div>
+            <div>
+                <h5 class="font-bold mb-4 text-stone-900">Apmokėjimas</h5>
+                <p>Stripe (kortelės) / Telegram užsakymas</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="cart-modal" class="fixed inset-0 bg-black/60 hidden z-[100] flex justify-end">
+    <div class="bg-white w-full max-w-md h-full p-8 flex flex-col shadow-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold text-emerald-900">Krepšelis</h3>
+            <button onclick="toggleCart()" class="text-stone-400 hover:text-red-500 text-2xl">&times;</button>
+        </div>
+
+        <div id="cart-items" class="flex-grow overflow-y-auto space-y-4 mb-6"></div>
+
+        <div class="border-t pt-6 space-y-4">
+            <input type="text" id="cust-name" placeholder="Vardas" class="w-full p-3 border rounded-xl focus:outline-emerald-500">
+            <input type="tel" id="cust-phone" placeholder="Telefonas (+370...)" class="w-full p-3 border rounded-xl focus:outline-emerald-500">
+            <textarea id="cust-address" placeholder="Pristatymo adresas (Miestas, gatvė, namas)" class="w-full p-3 border rounded-xl focus:outline-emerald-500" rows="2"></textarea>
+            
+            <div class="py-4">
+                <p class="text-xl font-bold flex justify-between">
+                    <span>Viso:</span>
+                    <span class="text-emerald-800"><span id="total">0</span> €</span>
+                </p>
+            </div>
+
+            <button onclick="checkout()" class="w-full bg-emerald-800 text-white py-4 rounded-2xl font-bold hover:bg-emerald-700 transition shadow-lg">
+                Užsakyti per Telegram
+            </button>
+        </div>
+    </div>
+</div>
+
+
+    <script>
+        const products = [
+            { id: 1, name: "Žirniai (100g)", price: 3.00, desc: "Saldus, traškus, primena jaunus žirnelius.", img: "goroshok.jpg" },
+            { id: 2, name: "Svogūnai (100g)", price: 4.00, desc: "Pikantiškas, švelnaus aštrumo skonis.", img: "csubulya.jpg" },
+            { id: 3, name: "Chia (100g)", price: 2.50, desc: "Švelnus, neutralus skonis, itin sveika.", img: "chia.jpg" },
+            { id: 4, name: "Amarantai (100g)", price: 3.50, desc: "Švelnus žemės skonis, ryški spalva.", img: "amarant.jpg" },
+            { id: 5, name: "Garstyčios (100g)", price: 3.00, desc: "Aštraus, šildančio skonio mikrogrynai.", img: "girchucsya.jpg" }
+        ];
+
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = products.map(p => `
+                <div class="product-card bg-white p-6 rounded-3xl border border-stone-100 shadow-sm flex flex-col">
+                    <img src="${p.img}" class="w-full h-48 object-cover rounded-2xl mb-4 shadow-inner" alt="${p.name}">
+                    <h3 class="text-xl font-bold mb-1">${p.name}</h3>
+                    <p class="text-xs text-stone-400 mb-3 italic">${p.desc}</p>
+                    <div class="mt-auto flex justify-between items-center">
+                        <span class="text-2xl font-black text-emerald-800">${p.price.toFixed(2)} €</span>
+                        <button onclick="addToCart('${p.name}', ${p.price})" class="bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-600 transition">Į krepšelį</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        let cart = [];
+
+// 1. Функція відображення товарів на сторінці
+function renderProducts() {
+    const grid = document.getElementById('product-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = products.map(p => `
+        <div class="product-card bg-white p-6 rounded-3xl border border-stone-100 shadow-sm flex flex-col h-full" 
+             onmousemove="handleMove(event, this)" 
+             onmouseleave="handleLeave(this)">
+            <img src="${p.img}" class="w-full h-48 object-cover rounded-2xl mb-4 shadow-inner pointer-events-none" alt="${p.name}">
+            <h3 class="text-xl font-bold mb-1">${p.name}</h3>
+            <p class="text-xs text-stone-400 mb-3 italic">${p.desc}</p>
+            <div class="mt-auto flex justify-between items-center">
+                <span class="text-2xl font-black text-emerald-800">${p.price.toFixed(2)} €</span>
+                <button onclick="addToCart('${p.name}', ${p.price})" class="bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-600 transition shadow-md active:scale-95">Į krepšelį</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 2. 3D Ефект при наведенні
+function handleMove(e, el) {
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const dx = x - rect.width / 2;
+    const dy = y - rect.height / 2;
+    el.style.transform = `perspective(1000px) rotateX(${-dy / 10}deg) rotateY(${dx / 10}deg) translateY(-5px)`;
+}
+
+function handleLeave(el) {
+    el.style.transform = `perspective(1000px) rotateX(0) rotateY(0) translateY(0)`;
+}
+
+// 3. Логіка кошика
+function addToCart(name, price) {
+    cart.push({ name, price });
+    updateUI();
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateUI();
+    renderCartItems();
+}
+
+function updateUI() {
+    const count = document.getElementById('cart-count');
+    if (count) {
+        count.innerText = cart.length;
+        count.classList.toggle('hidden', cart.length === 0);
+    }
+}
+
+function toggleCart() {
+    const modal = document.getElementById('cart-modal');
+    modal.classList.toggle('hidden');
+    renderCartItems();
+}
+
+function renderCartItems() {
+    const container = document.getElementById('cart-items');
+    const totalEl = document.getElementById('total');
+    
+    if (cart.length === 0) {
+        container.innerHTML = '<p class="text-center text-stone-400 py-10">Krepšelis tuščias</p>';
+        totalEl.innerText = "0.00";
+        return;
+    }
+
+    container.innerHTML = cart.map((item, index) => `
+        <div class="flex justify-between items-center bg-stone-50 p-3 rounded-xl mb-2 border border-stone-100">
+            <div>
+                <p class="font-bold text-sm text-stone-800">${item.name}</p>
+                <p class="text-emerald-700 text-xs">${item.price.toFixed(2)} €</p>
+            </div>
+            <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 p-2">&times;</button>
+        </div>
+    `).join('');
+
+    const total = cart.reduce((sum, i) => sum + i.price, 0);
+    totalEl.innerText = total.toFixed(2);
+}
+
+// 4. Функція відправки в Telegram
+async function checkout() {
+    const name = document.getElementById('cust-name').value;
+    const phone = document.getElementById('cust-phone').value;
+    const address = document.getElementById('cust-address').value;
+
+    if (cart.length === 0) return alert("Krepšelis tuščias!");
+    if (!name || !phone || !address) return alert("Prašome užpildyti visus laukus!");
+
+    // --- ВСТАВ СЮДИ СВОЇ ДАНІ ---
+    const token = '8334566349:AAH29OhHgIHq8mj7brtcigZotsXDH_oJMA8'; 
+    const chatId = '8200040191';
+    // ---------------------------
+
+    let message = `🌱 *NAUJAS UŽSAKYMAS: GREENADO*\n`;
+    message += `━━━━━━━━━━━━━━━━━━\n`;
+    message += `👤 *Klientas:* ${name}\n`;
+    message += `📞 *Tel:* ${phone}\n`;
+    message += `📍 *Adresas:* ${address}\n`;
+    message += `━━━━━━━━━━━━━━━━━━\n`;
+    
+    cart.forEach((item, index) => {
+        message += `${index + 1}. ${item.name} - ${item.price.toFixed(2)} €\n`;
+    });
+    
+    const total = cart.reduce((sum, i) => sum + i.price, 0);
+    message += `━━━━━━━━━━━━━━━━━━\n`;
+    message += `💰 *VISO: ${total.toFixed(2)} €*\n`;
+    message += `🚚 *Pristatymas:* Pirmadienis / Ketvirtadienis\n`;
+    message += `📍 *Miestas:* Kaunas / Jonava`;
+
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: message,
+                parse_mode: 'Markdown'
+            })
+        });
+
+        if (response.ok) {
+            alert("Ačiū, " + name + "! Užsakymas gautas. Susisieksime su Jumis.");
+            cart = [];
+            updateUI();
+            toggleCart();
+            // Очищення полів
+            document.getElementById('cust-name').value = '';
+            document.getElementById('cust-phone').value = '';
+            document.getElementById('cust-address').value = '';
+        } else {
+            alert("Klaida siunčiant duomenis. Patikrinkite Bot Token.");
+        }
+    } catch (error) {
+        alert("Ryšio klaida. Patikrinkite internetą.");
+    }
+}
+
+// Запуск рендерингу при завантаженні сторінки
+document.addEventListener('DOMContentLoaded', renderProducts);
+
+    </script>
+</body>
+</html>
