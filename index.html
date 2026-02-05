@@ -187,13 +187,16 @@
                 return;
             }
 
-            const message = `🌿 NAUJAS UŽSAKYMAS:
+            const totalSum = cart.reduce((sum, i) => sum + i.price, 0).toFixed(2);
+
+    const message = `🌿 NAUJAS UŽSAKYMAS:
 👤 Klientas: ${nameI.value}
 📞 Tel: ${phoneI.value}
 📍 Adresas: ${addrI.value}
 🚚 Pristatymas: ${dayI.value}
 🛒 Prekės:
-${cart.map(i => `- ${i.name}`).join('\n')}`;
+${cart.map(i => `- ${i.name}`).join('\n')}
+💰 VISO: ${totalSum} €`;
 
             try {
                 // Пряме посилання без пробілів
