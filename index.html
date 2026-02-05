@@ -246,13 +246,11 @@ async function sendOrder() {
 
     // Спроба відправити дані
     try {
-        await fetch("https://script.google.com/macros/s/AKfycbzFeGpzZC5ImMPNvHUNMt6C__iemBgwpkqrdzT7LRshGKt6Xbyajl0KbLshOpB7yjdM/exec", {
+        await fetch("https://script.google.com/macros/s/AKfycbzdgX4C9nEUHaS-t-BC_CNBSJ1fTx8OVsGMRoq1zLygl8ACv21CGuZtgHyy2_u3o1mc/exec", {
             method: "POST",
             mode: "no-cors", // Це важливо для Google Scripts
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ message: fullMessage })
+           
+          body: JSON.stringify({ message: fullMessage })
         });
 
         // Оскільки ми використовуємо no-cors, ми не отримаємо статус 200, 
@@ -276,3 +274,4 @@ document.addEventListener('DOMContentLoaded', renderProducts);
     </script>
 </body>
 </html>
+
