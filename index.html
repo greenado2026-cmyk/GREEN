@@ -231,63 +231,42 @@ function renderCartItems() {
 }
 
 // 4. Функція відправки в Telegram
-async function checkout() {
-    const name = document.getElementById('cust-name').value;
-    const phone = document.getElementById('cust-phone').value;
-    const address = document.getElementById('cust-address').value;
-
-    if (cart.length === 0) return alert("Krepšelis tuščias!");
-    if (!name || !phone || !address) return alert("Prašome užpildyti visus laukus!");
-
-    // --- ВСТАВ СЮДИ СВОЇ ДАНІ ---
-    const token = ''; 
-    const chatId = '';
-    // ---------------------------
-
-    let message = `🌱 *NAUJAS UŽSAKYMAS: GREENADO*\n`;
-    message += `━━━━━━━━━━━━━━━━━━\n`;
-    message += `👤 *Klientas:* ${name}\n`;
-    message += `📞 *Tel:* ${phone}\n`;
-    message += `📍 *Adresas:* ${address}\n`;
-    message += `━━━━━━━━━━━━━━━━━━\n`;
+async function sendOrder() {
+    const name = document.getElementById('name').value;
+    const phone = document.getElementById('phone').value;
+    const address = document.getElementById('address').value;
     
-    cart.forEach((item, index) => {
-        message += `${index + 1}. ${item.name} - ${item.price.toFixed(2)} €\n`;
-    });
-    
-    const total = cart.reduce((sum, i) => sum + i.price, 0);
-    message += `━━━━━━━━━━━━━━━━━━\n`;
-    message += `💰 *VISO: ${total.toFixed(2)} €*\n`;
-    message += `🚚 *Pristatymas:* Pirmadienis / Ketvirtadienis\n`;
-    message += `📍 *Miestas:* Kaunas / Jonava`;
+    if(!name || !phone) {
+        alert('Будь ласка, заповніть ім\'я та телефон');
+        return;
+    }
 
-    const url = `https://api.telegram.org/bot${token}/sendMessage`;
+    let orderDetails = cart.map(i => `- ${i.name}`).join('\n');
+    let fullMessage = `👤 Клієнт: ${name}\n📞 Тел: ${phone}\n📍 Адреса: ${address}\n🛒 Товари:\n${orderDetails}`;
 
+    // Спроба відправити дані
     try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                text: message,
-                parse_mode: 'Markdown'
-            })
+        await fetch("https://script.google.com/macros/s/AKfycbzFeGpzZC5ImMPNvHUNMt6C__iemBgwpkqrdzT7LRshGKt6Xbyajl0KbLshOpB7yjdM/exec", {
+            method: "POST",
+            mode: "no-cors", // Це важливо для Google Scripts
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ message: fullMessage })
         });
 
-        if (response.ok) {
-            alert("Ačiū, " + name + "! Užsakymas gautas. Susisieksime su Jumis.");
-            cart = [];
-            updateUI();
-            toggleCart();
-            // Очищення полів
-            document.getElementById('cust-name').value = '';
-            document.getElementById('cust-phone').value = '';
-            document.getElementById('cust-address').value = '';
-        } else {
-            alert("Klaida siunčiant duomenis. Patikrinkite Bot Token.");
-        }
-    } catch (error) {
-        alert("Ryšio klaida. Patikrinkite internetą.");
+        // Оскільки ми використовуємо no-cors, ми не отримаємо статус 200, 
+        // тому просто виводимо успіх клієнту
+        alert('Дякуємо! Замовлення надіслано.');
+        cart = [];
+        updateCart();
+        document.getElementById('name').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('address').value = '';
+
+    } catch (e) {
+        console.log(e);
+        alert('Помилка відправки, але ми перевіримо замовлення!');
     }
 }
 
