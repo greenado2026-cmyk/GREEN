@@ -6,24 +6,27 @@
     <title>GREENADO | Mikrožalumynai</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root { --brand-green: #004d3d; --light-green: #00ffcc; }
         .product-card { transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); perspective: 1000px; }
         .product-card:hover { transform: translateY(-10px) rotateX(5deg) rotateY(5deg); box-shadow: 0 20px 30px rgba(0, 77, 61, 0.15); }
         .slogan-text { color: var(--brand-green); font-weight: 600; }
+        #map { transition: all 0.3s ease; }
     </style>
 </head>
 <body class="bg-white text-stone-800">
 
     <nav class="sticky top-0 bg-white shadow-sm z-50 border-b border-stone-100 h-16 md:h-20">
-        <div class="w-full h-full flex justify-between items-center">
-            <div class="h-full">
+        <div class="w-full h-full flex justify-between items-center px-4">
+            <div class="h-full py-2">
                 <img src="logo.jpg" alt="GREENADO" class="h-full w-auto object-contain object-left">
             </div>
-            <div class="hidden lg:block">
+            <div class="hidden lg:block text-center">
                 <p class="slogan-text text-lg italic font-semibold text-emerald-800">„Maži daigai = didelė galia“</p>
             </div>
-            <div class="pr-6">
+            <div class="flex items-center gap-4">
                 <button onclick="toggleCart()" class="relative p-2 text-emerald-900">
                     <i class="fa-solid fa-basket-shopping text-2xl"></i>
                     <span id="cart-count" class="absolute -top-1 -right-1 bg-green-500 text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
@@ -45,23 +48,23 @@
         <div class="container mx-auto max-w-4xl text-center">
             <h2 class="text-3xl font-bold mb-8">Kodėl GREENADO?</h2>
             <p class="text-lg leading-relaxed mb-6 italic text-emerald-100">
-                Šiuolaikiniame skubančiame pasaulyje mikrožalumynai yra tikras "supermaistas"...
+                Šiuolaikiniame skubančiame pasaulyje mikrožalumynai yra tikras "supermaistas", suteikiantis energijos ir sveikatos.
             </p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 text-left">
                 <div class="p-4 border border-emerald-700 rounded-xl">
-                    <h4 class="font-bold mb-2">🚚 Pristatymas</h4>
+                    <h4 class="font-bold mb-2 text-white">🚚 Pristatymas</h4>
                     <p class="text-sm opacity-80">Kaunas, Jonava ir apylinkės. Pristatome pirmadieniais ir ketvirtadieniais.</p>
                 </div>
                 <div class="p-4 border border-emerald-700 rounded-xl">
-                    <h4 class="font-bold mb-2">✅ Kokybė</h4>
-                    <p class="text-sm opacity-80">Auginama be pesticidų, naudojant tik švarų vandenį ir aukščiausios kokybės sėklas.</p>
+                    <h4 class="font-bold mb-2 text-white">✅ Kokybė</h4>
+                    <p class="text-sm opacity-80">Auginama be pesticidų, naudojant tik švarų vandenį і aukščiausios kokybės sėklas.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <footer class="bg-white border-t py-12 px-6 text-sm text-stone-500">
-        <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
             <div>
                 <h5 class="font-bold mb-4 text-stone-900">Kontaktai</h5>
                 <p>Kaunas / Jonava, Lietuva</p>
@@ -72,7 +75,7 @@
             </div>
             <div>
                 <h5 class="font-bold mb-4 text-stone-900">Apmokėjimas</h5>
-                <p>Telegram užsakymas / Grynais pristatymo metu</p>
+                <p>Grynais pristatymo metu</p>
             </div>
         </div>
     </footer>
@@ -89,13 +92,20 @@
             <div class="border-t pt-6 space-y-4">
                 <input type="text" id="cust-name" placeholder="Vardas" class="w-full p-3 border rounded-xl focus:outline-emerald-500">
                 <input type="tel" id="cust-phone" placeholder="Telefonas (+370...)" class="w-full p-3 border rounded-xl focus:outline-emerald-500">
-                <textarea id="cust-address" placeholder="Pristatymo adresas" class="w-full p-3 border rounded-xl focus:outline-emerald-500" rows="2"></textarea>
                 
+                <div class="space-y-2">
+                    <textarea id="cust-address" placeholder="Pristatymo adresas" class="w-full p-3 border rounded-xl focus:outline-emerald-500" rows="2"></textarea>
+                    <button type="button" onclick="initMap()" class="text-xs text-emerald-700 font-bold hover:underline flex items-center gap-1">
+                        <i class="fa-solid fa-map-location-dot"></i> Pasirinkti žemėlapyje
+                    </button>
+                    <div id="map" class="w-full h-64 rounded-xl border hidden shadow-inner"></div>
+                </div>
+
                 <div class="space-y-1">
                     <label class="text-xs text-stone-500 ml-1">Pristatymo diena:</label>
-                    <select id="delivery-day" class="w-full p-3 border rounded-xl focus:outline-emerald-500 bg-white shadow-sm">
-                        <option value="Pirmadienis">Pirmadienis (Pirmadienis)</option>
-                        <option value="Ketvirtadienis">Ketvirtadienis (Ketvirtadienis)</option>
+                    <select id="delivery-day" class="w-full p-3 border rounded-xl focus:outline-emerald-500 bg-white">
+                        <option value="Pirmadienis">Pirmadienis</option>
+                        <option value="Ketvirtadienis">Ketvirtadienis</option>
                     </select>
                 </div>
 
@@ -120,18 +130,20 @@
         ];
 
         let cart = [];
+        let map;
+        let marker;
 
         function renderProducts() {
             const grid = document.getElementById('product-grid');
             if (!grid) return;
             grid.innerHTML = products.map(p => `
                 <div class="product-card bg-white p-6 rounded-3xl border border-stone-100 shadow-sm flex flex-col h-full">
-                    <img src="${p.img}" class="w-full h-48 object-cover rounded-2xl mb-4 shadow-inner pointer-events-none" alt="${p.name}">
+                    <img src="${p.img}" class="w-full h-48 object-cover rounded-2xl mb-4 shadow-inner" alt="${p.name}">
                     <h3 class="text-xl font-bold mb-1">${p.name}</h3>
                     <p class="text-xs text-stone-400 mb-3 italic">${p.desc}</p>
                     <div class="mt-auto flex justify-between items-center">
                         <span class="text-2xl font-black text-emerald-800">${p.price.toFixed(2)} €</span>
-                        <button onclick="addToCart('${p.name}', ${p.price})" class="bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-600 transition shadow-md active:scale-95">Į krepšelį</button>
+                        <button onclick="addToCart('${p.name}', ${p.price})" class="bg-emerald-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-600 transition shadow-md">Į krepšelį</button>
                     </div>
                 </div>
             `).join('');
@@ -139,19 +151,12 @@
 
         function addToCart(name, price) { cart.push({ name, price }); updateUI(); }
         function toggleCart() { document.getElementById('cart-modal').classList.toggle('hidden'); renderCartItems(); }
-        
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateUI();
-            renderCartItems();
-        }
+        function removeFromCart(index) { cart.splice(index, 1); updateUI(); renderCartItems(); }
 
         function updateUI() {
             const count = document.getElementById('cart-count');
-            if (count) {
-                count.innerText = cart.length;
-                count.classList.toggle('hidden', cart.length === 0);
-            }
+            count.innerText = cart.length;
+            count.classList.toggle('hidden', cart.length === 0);
         }
 
         function renderCartItems() {
@@ -171,25 +176,36 @@
             totalEl.innerText = cart.reduce((sum, i) => sum + i.price, 0).toFixed(2);
         }
 
+        function initMap() {
+            const mapDiv = document.getElementById('map');
+            mapDiv.classList.toggle('hidden');
+            if (!map) {
+                map = L.map('map').setView([54.8985, 23.9036], 12);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                map.on('click', function(e) {
+                    const { lat, lng } = e.latlng;
+                    if (marker) { marker.setLatLng(e.latlng); } 
+                    else { marker = L.marker(e.latlng).addTo(map); }
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                        .then(r => r.json())
+                        .then(data => { document.getElementById('cust-address').value = data.display_name; })
+                        .catch(() => { document.getElementById('cust-address').value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`; });
+                });
+            }
+            setTimeout(() => { map.invalidateSize(); }, 300);
+        }
+
         async function sendOrder() {
             const nameI = document.getElementById('cust-name');
             const phoneI = document.getElementById('cust-phone');
             const addrI = document.getElementById('cust-address');
             const dayI = document.getElementById('delivery-day');
 
-            if(!nameI.value || !phoneI.value) {
-                alert("Prašome įvesti vardą ir telefoną");
-                return;
-            }
-
-            if(cart.length === 0) {
-                alert("Krepšelis tuščias");
-                return;
-            }
+            if(!nameI.value || !phoneI.value) { alert("Prašome įvesti vardą ir telefoną"); return; }
+            if(cart.length === 0) { alert("Krepšelis tuščias"); return; }
 
             const totalSum = cart.reduce((sum, i) => sum + i.price, 0).toFixed(2);
-
-    const message = `🌿 NAUJAS UŽSAKYMAS:
+            const message = `🌿 NAUJAS UŽSAKYMAS:
 👤 Klientas: ${nameI.value}
 📞 Tel: ${phoneI.value}
 📍 Adresas: ${addrI.value}
@@ -199,13 +215,11 @@ ${cart.map(i => `- ${i.name}`).join('\n')}
 💰 VISO: ${totalSum} €`;
 
             try {
-                // Пряме посилання без пробілів
-                await fetch("https://script.google.com/macros/s/AKfycbzdgX4C9nEUHaS-t-BC_CNBSJ1fTx8OVsGMRoq1zLygl8ACv21CGuZtgHyy2_u3o1mc/exec", {
+                await fetch("https://script.google.com/macros/s/AKfycbzFeGpzZC5ImMPNvHUNMt6C__iemBgwqkrdzY7LRshGKt6Xbyajl0KblshOpB7yjdM/exec", {
                     method: "POST",
                     mode: "no-cors",
                     body: JSON.stringify({ message: message })
                 });
-
                 alert('Dėkojame! Užsakymas išsiųstas.');
                 cart = []; updateUI(); toggleCart();
                 nameI.value = ''; phoneI.value = ''; addrI.value = '';
